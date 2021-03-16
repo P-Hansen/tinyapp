@@ -21,13 +21,11 @@ app.get("/urls/new", (req, res) => {
 
 app.post("/urls", (req, res) => {
   console.log(req.body);  // Log the POST request body to the console
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  //comsole.log(generateRandomString());
+  urlDatabase[generateRandomString()] = req.body.longURL;
+  res.send("Logged");         // Respond with 'Ok' (we will replace this)
 });
 
-/*app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
-  res.render("urls_index", templateVars);
-});*/
 
 app.get("/urls/:shortURL", (req, res) => {
   const templateVars = {
@@ -48,6 +46,11 @@ app.get("/fetch", (req, res) => {
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+});
+
+app.get("/urls", (req, res) => {
+  const templateVars = { urls: urlDatabase };
+  res.render("urls_index", templateVars);
 });
 
 app.get("/", (req, res) => {
