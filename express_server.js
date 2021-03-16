@@ -2,6 +2,8 @@ const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
+const { request } = require("express");
+const morgan = require("morgan");
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
@@ -10,6 +12,8 @@ const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+app.use(morgan("dev"));
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
@@ -45,9 +49,9 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   let key = req.params.shortURL;
   key = key.replace(/:/g, '');
-  console.log("this is the key: "+key);
+  //console.log("this is the key: "+key);
   const longURL = urlDatabase[key];
-  console.log("this is the long url: "+longURL);
+  //console.log("this is the long url: "+longURL);
   res.redirect(longURL);
 });
 
