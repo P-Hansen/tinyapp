@@ -15,15 +15,22 @@
     <table class="table">
       <thead>
         <tr>
+          
           <th scope="col">Short URL</th>
           <th scope="col">Long URL</th>
+          <th scope="col">Delete</th>
         </tr>
       </thead>
       <tbody>
         <% for(let url in urls) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url] %></td>
+            <td><%= urls[url] %>
+            <th scope="col"></td>
+            <form method="POST" action="/urls/9sm5xK/delete">
+            <!--<input type="button" value="Delete">-->
+            <button name="button">Delete</button>
+            </form></th>
           </tr>
         <% } %>
       </tbody>
