@@ -20,19 +20,35 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // Log the POST request body to the console
-  //comsole.log(generateRandomString());
-  urlDatabase[generateRandomString()] = req.body.longURL;
-  res.send("Logged");         // Respond with 'Ok' (we will replace this)
+  const shortURL = generateRandomString();
+  //console.log(req.body.longURL);
+  //console.log(shortURL);
+  urlDatabase[shortURL] = req.body.longURL;
+  //console.log(Object.keys(urlDatabase));
+  //console.log(shortURL);
+  //console.log(urlDatabase[shortURL]);
+  res.redirect(`/urls/:${shortURL}`);
 });
 
-
 app.get("/urls/:shortURL", (req, res) => {
+  let key = req.params.shortURL;
+  key = key.replace(/:/g, '');
+  //console.log("Key = " + key);
+  //console.log("Long URL = " + urlDatabase[key]);
   const templateVars = {
     shortURL: req.params.shortURL,
-    longURL: req.params.longURL
+    longURL: urlDatabase[key] //req.params.longURL //Not working?!
     };
   res.render("urls_show", templateVars);
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  let key = req.params.shortURL;
+  key = key.replace(/:/g, '');
+  console.log("this is the key: "+key);
+  const longURL = urlDatabase[key];
+  console.log("this is the long url: "+longURL);
+  res.redirect(longURL);
 });
 
 app.get("/set", (req, res) => {
