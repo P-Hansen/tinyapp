@@ -23,9 +23,21 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls/:shortURL/delete", (req, res) => {
-  const key = req.params.shortURL;
+  let key = req.params.shortURL;
+  key = key.replace(/:/g, '');
   console.log("The thing to delete: " + key);
   delete urlDatabase[key];
+  res.redirect("/urls");
+});
+
+//edit
+app.post("/urls/:shortURL", (req, res) => {
+  let key = req.params.shortURL;
+  let updatedAddress = req.body.longURL;
+  key = key.replace(/:/g, '');
+  //console.log("update this key: " + key);
+  //console.log("update this address: ", updatedAddress);
+  urlDatabase[key] = updatedAddress;
   res.redirect("/urls");
 });
 
