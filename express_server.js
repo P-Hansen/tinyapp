@@ -16,6 +16,14 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+const users = {
+  "123456": {
+    id: "123456",
+    email: "fake@fakemail.com",
+    password: "p455w02d"
+  }
+};
+
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
@@ -58,15 +66,6 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
-//register
-app.post("/login", (req, res) => {
-  let username = req.body["username"];
-  console.log("this name is being baked into a cookie: ", username);
-  res.cookie("username", username);
-  console.log("the cookie contains: ", req.cookies["username"] );
-  res.redirect("/urls");
-});
-
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   //console.log(req.body.longURL);
@@ -100,7 +99,21 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-
+//register set
+app.post("/register", (req, res) => {
+  let newEmail = req.body["email"];
+  let newPassword = req.body["password"];
+  let newId = generateRandomString();
+  const userObj = {
+    id: newId,
+    email: newEmail,
+    password: newPassword
+  };
+  console.log(`database say hello to:${newId} email:${newEmail} and keep this password "${newPassword}" secret`);
+  users[newId] = userObj;
+  res.cookie("user_id", newId);
+  res.redirect("/urls");
+});
 
 //render register
 app.get("/register", (req, res) => {
