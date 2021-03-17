@@ -58,6 +58,15 @@ app.post("/logout", (req, res) => {
   res.redirect("/urls");
 });
 
+//register
+app.post("/login", (req, res) => {
+  let username = req.body["username"];
+  console.log("this name is being baked into a cookie: ", username);
+  res.cookie("username", username);
+  console.log("the cookie contains: ", req.cookies["username"] );
+  res.redirect("/urls");
+});
+
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   //console.log(req.body.longURL);
@@ -89,6 +98,17 @@ app.get("/fetch", (req, res) => {
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
+});
+
+
+
+//render register
+app.get("/register", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase
+  };
+  res.render("register", templateVars);
 });
 
 //render urls new
