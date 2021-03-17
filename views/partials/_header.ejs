@@ -10,7 +10,6 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-  </nav>
   <% if (username === undefined) { %>
     <form method="POST" action="/login/">
       <td class="card-title">login:</td>
@@ -19,9 +18,10 @@
       </input>
     </form>
   <% } else { %>
+    <td class="card-title">you are logged in as: &nbsp <b><%= username %></b> &nbsp &nbsp </td>
     <form method="POST" action="/logout/">
       <button type="submit" class="btn btn-primary">Logout</button>
     </form>
   <% }; %>
-  <h5 class="card-title"><%= username %></h5>
+  </nav>
 </header>

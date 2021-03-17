@@ -15,7 +15,7 @@
         <p class="card-text">Short URL: <a href="/u/<%= shortURL %>"><%= shortURL %></a></p>
         <th scope="col">
             <h1 class="card-title">Edit</h1>
-            <div style="display: flex; text-align: center">
+            <div style=" text-align: center">
                 <form method="POST" action="/urls/<%= shortURL %>">
                     <h4 class="card-title">New URL:</h4>
                     <input class="form-center" type="text" name="longURL" placeholder="<%= longURL %>" style="width: 300px">
