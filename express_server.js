@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser')
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cookieParser())
 app.use(morgan("dev"));
 
 const urlDatabase = {
@@ -17,10 +18,6 @@ const urlDatabase = {
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
-app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
 });
 
 //delete
@@ -48,6 +45,16 @@ app.post("/login", (req, res) => {
   let username = req.body["username"];
   console.log("this name is being baked into a cookie: ", username);
   res.cookie("username", username);
+  console.log("the cookie contains: ", req.cookies["username"] );
+  res.redirect("/urls");
+});
+
+//logout
+app.post("/logout", (req, res) => {
+  //let username = req.body["username"];
+  //console.log("this cookie is being eaten: ", username);
+  res.clearCookie("username");
+  //console.log("the cookie contains: ", req.cookies["username"]);
   res.redirect("/urls");
 });
 
@@ -60,18 +67,6 @@ app.post("/urls", (req, res) => {
   //console.log(shortURL);
   //console.log(urlDatabase[shortURL]);
   res.redirect(`/urls/:${shortURL}`);
-});
-
-app.get("/urls/:shortURL", (req, res) => {
-  let key = req.params.shortURL;
-  key = key.replace(/:/g, '');
-  //console.log("Key = " + key);
-  //console.log("Long URL = " + urlDatabase[key]);
-  const templateVars = {
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[key] //req.params.longURL //Not working?!
-    };
-  res.render("urls_show", templateVars);
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -96,19 +91,48 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+//render urls new
+app.get("/urls/new", (req, res) => {
+  const templateVars = {
+    username: req.cookies["username"]
+  };
+  res.render("urls_new", templateVars);
+});
+
+//render urls show
+app.get("/urls/:shortURL", (req, res) => {
+  let key = req.params.shortURL;
+  key = key.replace(/:/g, '');
+  //console.log("Key = " + key);
+  //console.log("Long URL = " + urlDatabase[key]);
+  const templateVars = {
+    username: req.cookies["username"],
+    shortURL: req.params.shortURL,
+    longURL: urlDatabase[key]
+  };
+  res.render("urls_show", templateVars);
+});
+
+//render index
 app.get("/urls", (req, res) => {
-  const templateVars = { urls: urlDatabase };
+  const templateVars = {
+    username: req.cookies["username"],
+    urls: urlDatabase
+  };
   res.render("urls_index", templateVars);
 });
 
+//root hello
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+//listen
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
 
+//random string
 function generateRandomString() {
   const possibleLetters = "1234567890QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
   let randomString = "";
