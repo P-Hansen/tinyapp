@@ -4,6 +4,7 @@ const PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 const { request } = require("express");
 const morgan = require("morgan");
+const cookieParser = require('cookie-parser')
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -22,6 +23,7 @@ app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
+//delete
 app.post("/urls/:shortURL/delete", (req, res) => {
   let key = req.params.shortURL;
   key = key.replace(/:/g, '');
@@ -38,6 +40,14 @@ app.post("/urls/:shortURL", (req, res) => {
   //console.log("update this key: " + key);
   //console.log("update this address: ", updatedAddress);
   urlDatabase[key] = updatedAddress;
+  res.redirect("/urls");
+});
+
+//login
+app.post("/login", (req, res) => {
+  let username = req.body["username"];
+  console.log("this name is being baked into a cookie: ", username);
+  res.cookie("username", username);
   res.redirect("/urls");
 });
 
