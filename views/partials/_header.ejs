@@ -10,15 +10,15 @@
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
       </div>
     </div>
-  <% if (username === undefined) { %>
-    <form method="POST" action="/login/">
-      <td class="card-title">login:</td>
-      <input class="form-center" type="text" name="username" style="width: 300px">
-        <button type="submit" class="btn btn-primary">Submit</button>
+  <% if (!user) { %>
+    <form method="GET" action="/register/">
+      <!-- <td class="card-title">login:</td> -->
+      <!-- <input class="form-center" type="text" name="username" style="width: 300px"> -->
+        <button type="submit" class="btn btn-primary">Login</button>
       </input>
     </form>
   <% } else { %>
-    <td class="card-title">you are logged in as: &nbsp <b><%= username %></b> &nbsp &nbsp </td>
+    <td class="card-title">you are logged in as: &nbsp <b><%= user.email %></b> &nbsp &nbsp </td>
     <form method="POST" action="/logout/">
       <button type="submit" class="btn btn-primary">Logout</button>
     </form>

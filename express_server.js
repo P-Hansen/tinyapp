@@ -17,7 +17,7 @@ const urlDatabase = {
 };
 
 const users = {
-  "123456": {
+  123456: {
     id: "123456",
     email: "fake@fakemail.com",
     password: "p455w02d"
@@ -52,8 +52,8 @@ app.post("/urls/:shortURL", (req, res) => {
 app.post("/login", (req, res) => {
   let username = req.body["username"];
   console.log("this name is being baked into a cookie: ", username);
-  res.cookie("username", username);
-  console.log("the cookie contains: ", req.cookies["username"] );
+  res.cookie("user_id", username);
+  console.log("the cookie contains: ", req.cookies["user_id"] );
   res.redirect("/urls");
 });
 
@@ -61,7 +61,7 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
   //let username = req.body["username"];
   //console.log("this cookie is being eaten: ", username);
-  res.clearCookie("username");
+  res.clearCookie("user_id");
   //console.log("the cookie contains: ", req.cookies["username"]);
   res.redirect("/urls");
 });
@@ -118,7 +118,7 @@ app.post("/register", (req, res) => {
 //render register
 app.get("/register", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies.user_id],
     urls: urlDatabase
   };
   res.render("register", templateVars);
@@ -127,7 +127,7 @@ app.get("/register", (req, res) => {
 //render urls new
 app.get("/urls/new", (req, res) => {
   const templateVars = {
-    username: req.cookies["username"]
+    user: users[req.cookies.user_id]
   };
   res.render("urls_new", templateVars);
 });
@@ -139,7 +139,7 @@ app.get("/urls/:shortURL", (req, res) => {
   //console.log("Key = " + key);
   //console.log("Long URL = " + urlDatabase[key]);
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies.user_id],
     shortURL: req.params.shortURL,
     longURL: urlDatabase[key]
   };
@@ -148,8 +148,11 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //render index
 app.get("/urls", (req, res) => {
+  //const key = req.cookies.user_id;
+  //console.log("is this the key?",key);//users[req.cookies]);
+  //console.log("is this the right entry?", users);
   const templateVars = {
-    username: req.cookies["username"],
+    user: users[req.cookies.user_id],
     urls: urlDatabase
   };
   res.render("urls_index", templateVars);
