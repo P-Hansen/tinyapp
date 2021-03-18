@@ -50,11 +50,19 @@ app.post("/urls/:shortURL", (req, res) => {
 
 //login
 app.post("/login", (req, res) => {
-  let username = req.body["username"];
-  console.log("this name is being baked into a cookie: ", username);
-  res.cookie("user_id", username);
-  console.log("the cookie contains: ", req.cookies["user_id"] );
-  res.redirect("/urls");
+  let newEmail = req.body["email"];
+  const pass = req.body["password"];
+  console.log("this person is trying to login: ", newEmail);
+  console.log("With this password:", pass);
+  for (const entry in users){
+    if (users[entry]["email"] === newEmail && users[entry]["password"] === pass){
+      console.log("All good come on in!");
+      res.cookie("user_id", users[entry]["id"]);
+      res.redirect("/urls");
+    };
+  };
+  res.status(403);
+  res.send('Error 403! email/password combination not found');
 });
 
 //logout
@@ -125,6 +133,15 @@ app.post("/register", (req, res) => {
     users[newId] = userObj;
     res.cookie("user_id", newId);
     res.redirect("/urls");
+});
+
+//render login
+app.get("/login", (req, res) => {
+  const templateVars = {
+    user: users[req.cookies.user_id],
+    urls: urlDatabase
+  };
+  res.render("login", templateVars);
 });
 
 //render register

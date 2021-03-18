@@ -11,10 +11,16 @@
       </div>
     </div>
   <% if (!user) { %>
+    <form method="GET" action="/login/">
+      <!-- <td class="card-title">login:</td> -->
+      <!-- <input class="form-center" type="text" name="username" style="width: 300px"> -->
+        <button type="submit" class="btn btn-primary">Login</button>&nbsp &nbsp &nbsp
+      </input>
+    </form>
     <form method="GET" action="/register/">
       <!-- <td class="card-title">login:</td> -->
       <!-- <input class="form-center" type="text" name="username" style="width: 300px"> -->
-        <button type="submit" class="btn btn-primary">Login</button>
+        <button type="submit" class="btn btn-primary">Register</button>
       </input>
     </form>
   <% } else { %>
