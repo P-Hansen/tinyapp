@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const { request } = require("express");
 const morgan = require("morgan");
 const cookieParser = require('cookie-parser')
+const bcrypt = require('bcrypt');
 
 //middleware
 app.set("view engine", "ejs");
@@ -64,18 +65,24 @@ app.post("/urls/:shortURL", (req, res) => {
 //login
 app.post("/login", (req, res) => {
   let newEmail = req.body["email"];
-  const pass = req.body["password"];
+  let pass = req.body["password"];
+  let i = 0;
   console.log("this person is trying to login: ", newEmail);
   console.log("With this password:", pass);
-  for (const entry in users){
-    if (users[entry]["email"] === newEmail && users[entry]["password"] === pass){
-      console.log("All good come on in!");
-      res.cookie("user_id", users[entry]["id"]);
-      res.redirect("/urls");
-    };
+  for (const entry in users) {
+    bcrypt.compare(pass, users[entry]["password"], (err, result) => {
+      if (result === true) {
+        console.log("All good come on in!");
+        res.cookie("user_id", users[entry]["id"]);
+        res.redirect("/urls");
+      } else if (i === Object.keys(users).length-1) {
+        res.status(403);
+        res.send('Error 403! email/password combination not found');
+      }
+      i++;
+    });
+    //if (users[entry]["email"] === newEmail && users[entry]["password"] === pass){
   };
-  res.status(403);
-  res.send('Error 403! email/password combination not found');
 });
 
 //logout
@@ -125,28 +132,33 @@ app.get("/urls.json", (req, res) => {
 app.post("/register", (req, res) => {
   let newEmail = req.body["email"];
   let newPassword = req.body["password"];
-  console.log("is this thing empty? ",newEmail);
-  if (!newEmail){
-    res.status(400);
-    res.send('Error 400! empty email');
-  };
-  for (const entry in users){
-    //console.log("this shouls be all the emails: ", users[entry]["email"]);
-    if (users[entry]["email"] === newEmail){
-      res.status(400);
-      res.send('Error 400! email already in use');
-    };
-  };
-    let newId = generateRandomString();
-    const userObj = {
-      id: newId,
-      email: newEmail,
-      password: newPassword
-    };
-    console.log(`database say hello to:${newId} email:${newEmail} and keep this password "${newPassword}" secret`);
-    users[newId] = userObj;
-    res.cookie("user_id", newId);
-    res.redirect("/urls");
+  bcrypt.genSalt(10, (err, salt) => {
+    bcrypt.hash(newPassword, salt, (err, hash) => {
+      newPassword = hash;
+      console.log("is this thing empty? ",newEmail);
+      if (!newEmail){
+        res.status(400);
+        res.send('Error 400! empty email');
+      };
+      for (const entry in users){
+        //console.log("this shouls be all the emails: ", users[entry]["email"]);
+        if (users[entry]["email"] === newEmail){
+          res.status(400);
+          res.send('Error 400! email already in use');
+        };
+      };
+        let newId = generateRandomString();
+        const userObj = {
+          id: newId,
+          email: newEmail,
+          password: newPassword
+        };
+        console.log(`database say hello to:${newId} email:${newEmail} and keep this password "${newPassword}" secret`);
+        users[newId] = userObj;
+        res.cookie("user_id", newId);
+        res.redirect("/urls");
+      })
+    })
 });
 
 //render login
