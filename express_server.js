@@ -103,16 +103,28 @@ app.get("/urls.json", (req, res) => {
 app.post("/register", (req, res) => {
   let newEmail = req.body["email"];
   let newPassword = req.body["password"];
-  let newId = generateRandomString();
-  const userObj = {
-    id: newId,
-    email: newEmail,
-    password: newPassword
+  console.log("is this thing empty? ",newEmail);
+  if (!newEmail){
+    res.status(400);
+    res.send('Error 400! empty email');
   };
-  console.log(`database say hello to:${newId} email:${newEmail} and keep this password "${newPassword}" secret`);
-  users[newId] = userObj;
-  res.cookie("user_id", newId);
-  res.redirect("/urls");
+  for (const entry in users){
+    //console.log("this shouls be all the emails: ", users[entry]["email"]);
+    if (users[entry]["email"] === newEmail){
+      res.status(400);
+      res.send('Error 400! email already in use');
+    };
+  };
+    let newId = generateRandomString();
+    const userObj = {
+      id: newId,
+      email: newEmail,
+      password: newPassword
+    };
+    console.log(`database say hello to:${newId} email:${newEmail} and keep this password "${newPassword}" secret`);
+    users[newId] = userObj;
+    res.cookie("user_id", newId);
+    res.redirect("/urls");
 });
 
 //render register
@@ -176,4 +188,4 @@ function generateRandomString() {
     randomString += possibleLetters[Math.floor(Math.random() * possibleLetters.length)];
   };
   return randomString;
-}
+};
