@@ -6,16 +6,17 @@ const { request } = require("express");
 const morgan = require("morgan");
 const cookieParser = require('cookie-parser')
 
+//middleware
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser())
 app.use(morgan("dev"));
 
+//data
 const urlDatabase = {
   "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userId: "1a1a1a"},
   "9sm5xK": {longURL: "http://www.google.com", userId: "2b2b2b"}
 };
-
 const users = {
   123456: {
     id: "123456",
@@ -192,7 +193,7 @@ app.get("/urls/:shortURL", (req, res) => {
     };
     res.render("urls_show", templateVars);
   } else {
-    res.redirect("login");
+    res.redirect("/login");
   };
 });
 
