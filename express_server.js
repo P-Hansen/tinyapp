@@ -12,8 +12,8 @@ app.use(cookieParser())
 app.use(morgan("dev"));
 
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  "b2xVn2": {longURL: "http://www.lighthouselabs.ca", userId: "1a1a1a"},
+  "9sm5xK": {longURL: "http://www.google.com", userId: "2b2b2b"}
 };
 
 const users = {
@@ -32,20 +32,32 @@ app.get("/hello", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   let key = req.params.shortURL;
   key = key.replace(/:/g, '');
-  console.log("The thing to delete: " + key);
-  delete urlDatabase[key];
-  res.redirect("/urls");
+  // console.log("key key key! ",key);
+  // console.log(`you can delete if you match ${req.cookies.user_id} - ${urlDatabase[key]["userId"]}`)
+  if (req.cookies.user_id === urlDatabase[key]["userId"]) {
+    console.log("The thing to delete: " + key);
+    delete urlDatabase[key];
+    res.redirect("/urls");
+  } else {
+    res.status(401);
+    res.send('Error 403! you do not have permission to delete this file');
+  };
 });
 
 //edit
 app.post("/urls/:shortURL", (req, res) => {
   let key = req.params.shortURL;
-  let updatedAddress = req.body.longURL;
   key = key.replace(/:/g, '');
+  if (req.cookies.user_id === urlDatabase[key]["userId"]) {
+    let updatedAddress = req.body.longURL;
   //console.log("update this key: " + key);
   //console.log("update this address: ", updatedAddress);
-  urlDatabase[key] = updatedAddress;
-  res.redirect("/urls");
+    urlDatabase[key] = {longURL: updatedAddress, userId: req.cookies.user_id};
+    res.redirect("/urls");
+  } else {
+  res.status(401);
+  res.send('Error 403! you do not have permission to edit this file');
+  };
 });
 
 //login
@@ -78,18 +90,19 @@ app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
   //console.log(req.body.longURL);
   //console.log(shortURL);
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL] = {longURL: req.body.longURL, userId: req.cookies.user_id};
   //console.log(Object.keys(urlDatabase));
   //console.log(shortURL);
   //console.log(urlDatabase[shortURL]);
   res.redirect(`/urls/:${shortURL}`);
 });
 
+//Short URL link out NO LOGIN NEEDED!
 app.get("/u/:shortURL", (req, res) => {
   let key = req.params.shortURL;
   key = key.replace(/:/g, '');
   //console.log("this is the key: "+key);
-  const longURL = urlDatabase[key];
+  const longURL = urlDatabase[key]["longURL"];
   //console.log("this is the long url: "+longURL);
   res.redirect(longURL);
 });
@@ -155,34 +168,39 @@ app.get("/register", (req, res) => {
 
 //render urls new
 app.get("/urls/new", (req, res) => {
-  const templateVars = {
-    user: users[req.cookies.user_id]
+  if (loggedIn(req, res)) {
+    const templateVars = {
+      user: users[req.cookies.user_id]
+    };
+    res.render("urls_new", templateVars);
+  } else {
+    res.redirect("/login");
   };
-  res.render("urls_new", templateVars);
 });
 
 //render urls show
 app.get("/urls/:shortURL", (req, res) => {
-  let key = req.params.shortURL;
-  key = key.replace(/:/g, '');
-  //console.log("Key = " + key);
-  //console.log("Long URL = " + urlDatabase[key]);
-  const templateVars = {
-    user: users[req.cookies.user_id],
-    shortURL: req.params.shortURL,
-    longURL: urlDatabase[key]
+  if (loggedIn(req, res)) {
+    let key = req.params.shortURL;
+    key = key.replace(/:/g, '');
+    //console.log("Key = " + key);
+    //console.log("Long URL = " + urlDatabase[key]);
+    const templateVars = {
+      user: users[req.cookies.user_id],
+      shortURL: req.params.shortURL,
+      longURL: urlDatabase[key]["longURL"]
+    };
+    res.render("urls_show", templateVars);
+  } else {
+    res.redirect("login");
   };
-  res.render("urls_show", templateVars);
 });
 
 //render index
 app.get("/urls", (req, res) => {
-  //const key = req.cookies.user_id;
-  //console.log("is this the key?",key);//users[req.cookies]);
-  //console.log("is this the right entry?", users);
   const templateVars = {
     user: users[req.cookies.user_id],
-    urls: urlDatabase
+    urls: urlsForUser(req.cookies.user_id)
   };
   res.render("urls_index", templateVars);
 });
@@ -205,4 +223,25 @@ function generateRandomString() {
     randomString += possibleLetters[Math.floor(Math.random() * possibleLetters.length)];
   };
   return randomString;
+};
+
+//Are you logged in?
+const loggedIn = (req, res) => {
+  if (req.cookies.user_id) {
+    return req.cookies.user_id;
+  } else {
+    return false;
+  };
+};
+
+//returns my urls
+const urlsForUser = (id) => {
+  const myURLs = {};
+  for (const entry in urlDatabase){
+    console.log(`are this ${urlDatabase[entry]["userId"]} and ${id} equal?`)
+    if (urlDatabase[entry]["userId"] === id){
+      myURLs[entry] = (urlDatabase[entry]);
+    };
+  };
+  return myURLs;
 };
