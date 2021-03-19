@@ -35,8 +35,6 @@ const users = {
 app.post("/urls/:shortURL/delete", (req, res) => {
   let key = req.params.shortURL;
   key = key.replace(/:/g, '');
-  // console.log("key key key! ",key);
-  // console.log(`you can delete if you match ${req.cookies.user_id} - ${urlDatabase[key]["userId"]}`)
   if (req.session.user_id === urlDatabase[key]["userId"]) {
     console.log("The thing to delete: " + key);
     delete urlDatabase[key];
@@ -53,8 +51,6 @@ app.post("/urls/:shortURL", (req, res) => {
   key = key.replace(/:/g, '');
   if (req.session.user_id === urlDatabase[key]["userId"]) {
     let updatedAddress = req.body.longURL;
-  //console.log("update this key: " + key);
-  //console.log("update this address: ", updatedAddress);
     urlDatabase[key] = {longURL: updatedAddress, userId: req.session.user_id};
     res.redirect("/urls");
   } else {
@@ -93,21 +89,14 @@ app.post("/login", (req, res) => {
 
 //logout
 app.post("/logout", (req, res) => {
-  //let username = req.body["username"];
-  //console.log("this cookie is being eaten: ", username);
   req.session = null;
-  //console.log("the cookie contains: ", req.cookies["username"]);
   res.redirect("/urls");
 });
 
+//making a new url
 app.post("/urls", (req, res) => {
   const shortURL = generateRandomString();
-  //console.log(req.body.longURL);
-  //console.log(shortURL);
   urlDatabase[shortURL] = {longURL: req.body.longURL, userId: req.session.user_id};
-  //console.log(Object.keys(urlDatabase));
-  //console.log(shortURL);
-  //console.log(urlDatabase[shortURL]);
   res.redirect(`/urls/:${shortURL}`);
 });
 
@@ -115,9 +104,7 @@ app.post("/urls", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   let key = req.params.shortURL;
   key = key.replace(/:/g, '');
-  //console.log("this is the key: "+key);
   const longURL = urlDatabase[key]["longURL"];
-  //console.log("this is the long url: "+longURL);
   res.redirect(longURL);
 });
 
@@ -133,10 +120,10 @@ app.post("/register", (req, res) => {
         res.status(400);
         res.send('Error 400! empty email');
       };
-      if (getUserByEmail(newEmail, users)){
+      if (!getUserByEmail(newEmail, users)){
         res.status(400);
         res.send('Error 400! email already in use');
-      };
+      } else {
       let newId = generateRandomString();
       const userObj = {
         id: newId,
@@ -148,8 +135,9 @@ app.post("/register", (req, res) => {
       //req.session("user_id", newId);
       req.session.user_id = newId;
       res.redirect("/urls");
-    })
-  })
+    }
+    });
+  });
 });
 
 //render login
@@ -187,8 +175,6 @@ app.get("/urls/:shortURL", (req, res) => {
   if (loggedIn(req, res)) {
     let key = req.params.shortURL;
     key = key.replace(/:/g, '');
-    //console.log("Key = " + key);
-    //console.log("Long URL = " + urlDatabase[key]);
     const templateVars = {
       user: users[req.session.user_id],
       shortURL: req.params.shortURL,
@@ -211,7 +197,7 @@ app.get("/urls", (req, res) => {
 
 //root hello
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  res.redirect("/urls");
 });
 
 //listen
