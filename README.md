@@ -5,8 +5,10 @@ TinyApp is a full stack web application built with Node and Express that allows 
 ## Final Product
 
 !["Creating a new tiny URL"](https://github.com/P-Hansen/tinyapp/blob/master/docs/Create%20new%20URL.png?raw=true)
-!["A new tiny URL made! edit or submit"](https://github.com/P-Hansen/tinyapp/blob/master/docs/My%20URLs.png?raw=true)
+
 !["A new tiny URL made! edit or submit"](https://github.com/P-Hansen/tinyapp/blob/master/docs/New%20URL.png?raw=true)
+
+!["Your new tiny link collection!"](https://github.com/P-Hansen/tinyapp/blob/master/docs/My%20URLs.png?raw=true)
 
 ## Dependencies
 
