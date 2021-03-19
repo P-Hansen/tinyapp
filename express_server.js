@@ -67,7 +67,7 @@ app.post("/login", (req, res) => {
   console.log("With this password:", pass);
   const entry = getUserByEmail(newEmail, users);
   console.log(entry);
-  if (entry !== null) {
+  if (entry !== null && users[entry]) {
       bcrypt.compare(pass, users[entry]["password"], (err, result) => {
       if (result === true) {
         console.log("All good come on in!");
@@ -120,7 +120,7 @@ app.post("/register", (req, res) => {
         res.status(400);
         res.send('Error 400! empty email');
       };
-      if (!getUserByEmail(newEmail, users)){
+      if (getUserByEmail(newEmail, users) !== null){
         res.status(400);
         res.send('Error 400! email already in use');
       } else {
@@ -188,11 +188,16 @@ app.get("/urls/:shortURL", (req, res) => {
 
 //render index
 app.get("/urls", (req, res) => {
+  const userKey = req.session.user_id;
+  if (userKey) {
   const templateVars = {
-    user: users[req.session.user_id],
+    user: users[userKey],
     urls: urlsForUser(req.session.user_id)
   };
   res.render("urls_index", templateVars);
+  } else {
+    res.redirect("/login");
+  }
 });
 
 //root hello
