@@ -1,18 +1,17 @@
 const express = require("express");
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080;
 const bodyParser = require("body-parser");
 const { request } = require("express");
 const morgan = require("morgan");
-//const cookieParser = require('cookie-parser');
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const getUserByEmail = require("./helpers");
+const generateRandomString = require("./randomString")
 
 //middleware
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: true }));
-//app.use(cookieParser())
 app.use(morgan("dev"));
 app.use(cookieSession({
   name: 'session',
@@ -31,10 +30,6 @@ const users = {
     password: "p455w02d"
   }
 };
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
 
 //delete
 app.post("/urls/:shortURL/delete", (req, res) => {
@@ -95,21 +90,6 @@ app.post("/login", (req, res) => {
     res.send('Error 403! email/password combination not found.');
   }
 });
-  // for (const entry in users) {
-  //   bcrypt.compare(pass, users[entry]["password"], (err, result) => {
-  //     if (result === true) {
-  //       console.log("All good come on in!");
-  //       //req.session("user_id", users[entry]["id"]);
-  //       req.session.user_id = users[entry]["id"];
-  //       res.redirect("/urls");
-  //     } else if (i === Object.keys(users).length-1) {
-  //       res.status(403);
-  //       res.send('Error 403! email/password combination not found');
-  //     }
-  //     i++;
-  //   });
-  //   //if (users[entry]["email"] === newEmail && users[entry]["password"] === pass){
-  // };
 
 //logout
 app.post("/logout", (req, res) => {
@@ -139,19 +119,6 @@ app.get("/u/:shortURL", (req, res) => {
   const longURL = urlDatabase[key]["longURL"];
   //console.log("this is the long url: "+longURL);
   res.redirect(longURL);
-});
-
-app.get("/set", (req, res) => {
-  const a = 1;
-  res.send(`a = ${a}`);
-});
-
-app.get("/fetch", (req, res) => {
-  res.send(`a = ${a}`);
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
 });
 
 //register set
@@ -251,16 +218,6 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
-
-//random string
-function generateRandomString() {
-  const possibleLetters = "1234567890QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm";
-  let randomString = "";
-  for (let i = 0; i < 6; i++) {
-    randomString += possibleLetters[Math.floor(Math.random() * possibleLetters.length)];
-  };
-  return randomString;
-};
 
 //Are you logged in?
 const loggedIn = (req, res) => {
