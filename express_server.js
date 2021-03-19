@@ -7,7 +7,7 @@ const morgan = require("morgan");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const getUserByEmail = require("./helpers");
-const generateRandomString = require("./randomString")
+const generateRandomString = require("./randomString");
 
 //middleware
 app.set("view engine", "ejs");
@@ -16,7 +16,7 @@ app.use(morgan("dev"));
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2']
-}))
+}));
 
 //data
 const urlDatabase = {
@@ -42,7 +42,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
   } else {
     res.status(401);
     res.send('Error 403! you do not have permission to delete this file');
-  };
+  }
 });
 
 //edit
@@ -54,9 +54,9 @@ app.post("/urls/:shortURL", (req, res) => {
     urlDatabase[key] = {longURL: updatedAddress, userId: req.session.user_id};
     res.redirect("/urls");
   } else {
-  res.status(401);
-  res.send('Error 403! you do not have permission to edit this file');
-  };
+    res.status(401);
+    res.send('Error 403! you do not have permission to edit this file');
+  }
 });
 
 //login
@@ -68,10 +68,9 @@ app.post("/login", (req, res) => {
   const entry = getUserByEmail(newEmail, users);
   console.log(entry);
   if (entry !== null && users[entry]) {
-      bcrypt.compare(pass, users[entry]["password"], (err, result) => {
+    bcrypt.compare(pass, users[entry]["password"], (err, result) => {
       if (result === true) {
         console.log("All good come on in!");
-        //req.session("user_id", users[entry]["id"]);
         req.session.user_id = users[entry]["id"];
         res.redirect("/urls");
       //password incorrect
@@ -116,26 +115,26 @@ app.post("/register", (req, res) => {
     bcrypt.hash(newPassword, salt, (err, hash) => {
       newPassword = hash;
       console.log("is this thing empty? ",newEmail);
-      if (!newEmail){
+      if (!newEmail) {
         res.status(400);
         res.send('Error 400! empty email');
-      };
-      if (getUserByEmail(newEmail, users) !== null){
+      }
+      if (getUserByEmail(newEmail, users) !== null) {
         res.status(400);
         res.send('Error 400! email already in use');
       } else {
-      let newId = generateRandomString();
-      const userObj = {
-        id: newId,
-        email: newEmail,
-        password: newPassword
-      };
-      console.log(`database say hello to:${newId} email:${newEmail} and keep this password "${newPassword}" secret`);
-      users[newId] = userObj;
-      //req.session("user_id", newId);
-      req.session.user_id = newId;
-      res.redirect("/urls");
-    }
+        let newId = generateRandomString();
+        const userObj = {
+          id: newId,
+          email: newEmail,
+          password: newPassword
+        };
+        console.log(`database say hello to:${newId} email:${newEmail} and keep this password "${newPassword}" secret`);
+        users[newId] = userObj;
+        //req.session("user_id", newId);
+        req.session.user_id = newId;
+        res.redirect("/urls");
+      }
     });
   });
 });
@@ -167,7 +166,7 @@ app.get("/urls/new", (req, res) => {
     res.render("urls_new", templateVars);
   } else {
     res.redirect("/login");
-  };
+  }
 });
 
 //render urls show
@@ -183,18 +182,18 @@ app.get("/urls/:shortURL", (req, res) => {
     res.render("urls_show", templateVars);
   } else {
     res.redirect("/login");
-  };
+  }
 });
 
 //render index
 app.get("/urls", (req, res) => {
   const userKey = req.session.user_id;
   if (userKey) {
-  const templateVars = {
-    user: users[userKey],
-    urls: urlsForUser(req.session.user_id)
-  };
-  res.render("urls_index", templateVars);
+    const templateVars = {
+      user: users[userKey],
+      urls: urlsForUser(req.session.user_id)
+    };
+    res.render("urls_index", templateVars);
   } else {
     res.redirect("/login");
   }
@@ -216,18 +215,18 @@ const loggedIn = (req, res) => {
     return req.session.user_id;
   } else {
     return false;
-  };
+  }
 };
 
 //returns my urls
 const urlsForUser = (id) => {
   const myURLs = {};
-  for (const entry in urlDatabase){
-    console.log(`are this ${urlDatabase[entry]["userId"]} and ${id} equal?`)
-    if (urlDatabase[entry]["userId"] === id){
+  for (const entry in urlDatabase) {
+    console.log(`are this ${urlDatabase[entry]["userId"]} and ${id} equal?`);
+    if (urlDatabase[entry]["userId"] === id) {
       myURLs[entry] = (urlDatabase[entry]);
-    };
-  };
+    }
+  }
   return myURLs;
 };
 
